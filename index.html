@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sharkie</title>
+    <link rel="shortcut icon" href="./img/assets/favicon.png">
+    <link rel="stylesheet" href="./style.css">
+    <link rel="stylesheet" href="./node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <link href="./node_modules/bootstrap/dist/js/bootstrap.bundle.min.css">
+
+    <script src="./js/images.js"></script>
+    <script src="./models/drawable-object.class.js"></script>
+    <script src="./models/movable-object.class.js"></script>
+    <script src="./models/character.class.js"></script>
+    <script src="./models/puffer-fish.class.js"></script>
+    <script src="./models/jelly-fish.class.js"></script>
+    <script src="./models/super-jelly-fish.class.js"></script>
+    <script src="./models/endboss.class.js"></script>
+    <script src="./models/collectable-object.class.js"></script>
+    <script src="./models/background-object.class.js"></script>
+    <script src="./models/keyboard.class.js"></script>
+    <script src="./models/status-bar.class.js"></script>
+    <script src="./models/chest.class.js"></script>
+    <script src="./models/level.class.js"></script>
+    <script src="./levels/level1.js"></script>
+    <script src="./models/throwable-object.class.js"></script>
+    <script src="./models/world.class.js"></script>
+    <script src="./js/game.js"></script>
+</head>
+
+<body onload="init()" onresize="handleWindowWidth()">
+    <div id="content"
+        onclick="hideElement('help'); replaceAnimationOf(document.getElementById('help'), 'fade-out-right')">
+        <!-- game -->
+        <div id="canvas-container" class="direction-column">
+            <h1 id="heading" class="d-none-mobile">Sharkie</h1>
+            <div class="canvas-subcontainer">
+                <canvas id="canvas" class="d-none shadow fade-in" width="720" height="480">
+
+                </canvas>
+                <!-- mobile hud -->
+                <div id="hud" class="d-none px-4 mt-2 mb-2_5">
+                    <div class="panel1">
+                        <div class="panel-wrapper action-image-container direction-column">
+                            <img id="slap" class="action-img background-whitesmoke border-black mb-3"
+                                src="./img/assets/mobile/slap.png" alt="Slap">
+                            <img id="throw-bubble" class="action-img background-whitesmoke border-black mb-3"
+                                src="./img/assets/mobile/bubble.png" alt="Throw Bubble">
+                            <img id="throw-poison" class="action-img background-whitesmoke border-black "
+                                src="./img/assets/mobile/poison.png" alt="Throw Poison">
+                        </div>
+                        <img id="arrow-up" class="arrow background-whitesmoke" src="./img/assets/mobile/arrow.png"
+                            alt="Arrow Up">
+                        <div class="panel-wrapper">
+                            <img id="arrow-left" class="arrow background-whitesmoke" src="./img/assets/mobile/arrow.png"
+                                alt="Arrow Left">
+                            <img id="arrow-down" class="arrow background-whitesmoke" src="./img/assets/mobile/arrow.png"
+                                alt="Arrow Down">
+                            <img id="arrow-right" class="arrow background-whitesmoke"
+                                src="./img/assets/mobile/arrow.png" alt="Arrow Right">
+                        </div>
+                    </div>
+
+                    <div class="panel2 pt-3 pe-1">
+                        <img onclick="setSound()" id="mobile-sound" class="d-none mobile-sound"
+                            src="./img/assets/mobile/mobile_sound.png" alt="Sound">
+                        <img onclick="setSound()" id="mobile-no-sound" class="mobile-sound"
+                            src="./img/assets/mobile/mobile_no_sound.png" alt="No Sound">
+                    </div>
+                </div>
+            </div>
+            <!-- loading screens -->
+            <h2 id="loading-screen" class="mb-3">Loading Game.&nbsp;.&nbsp;.</h2>
+            <div id="menu" class="d-none-mobile">
+                <button onclick="setSound()" class="shadow me-3">
+                    <img id="sound" class="d-none" src="./img/assets/sound.png" alt="Sound">
+                    <img id="no-sound" class="button-img" src="./img/assets/no_sound.png" alt="No Sound">
+                </button>
+
+                <button id="help-button" onclick="showElement('help'); doNotClose(event)" class="shadow">
+                    <img class="button-img" src="./img/assets/info.png" alt="Info">
+                </button>
+
+                <button onclick="enterFullscreen('canvas')" class="shadow ms-3">
+                    <img class="button-img" src="./img/assets/full-screen.png" alt="Fullscreen">
+                </button>
+            </div>
+            <div id="mobile-rotate" class="d-none">
+                <h2 class="mb-2">Please rotate your screen.</h2>
+                <span class="font-italic">Game Over before the game even began, huh? Talk about a big game.</span>
+            </div>
+        </div>
+        <!-- references -->
+        <div id="sub-content">
+            <span class="background-cadetblue shadow p-0-5 mb-2">Icons by
+                <a target="_blank" href="https://icons8.com">
+                    Icons8</a></span>
+            <span class="background-cadetblue shadow p-0-5">Background by
+                <a target="_blank"
+                    href="https://www.freepik.com/free-vector/ancient-ruins-old-architecture-sunken-water-sea-ocean_12876465.htm#page=2&query=underwater&position=14&from_view=search&track=sph">
+                    upklyak</a>
+                on Freepik</span>
+        </div>
+        <!-- post-game screens -->
+        <div id="winning-screen" class="d-none">
+            <button onclick="resetScreen(); init()" class="replay-button mb-12">Play again</button>
+        </div>
+
+        <div id="losing-screen" class="d-none">
+            <h1 class="mb-3">Game Over</h1>
+            <button onclick="resetScreen(); init()" class="replay-button">Try again</button>
+        </div>
+    </div>
+    <!-- help pop-up -->
+    <div id="help" class="v-hidden direction-column background-blue-gradient rounded-left px-3 fade-in-out">
+        <img onclick="hideElement('help'); replaceAnimationOf(document.getElementById('help'), 'fade-out-right')"
+            class="cross" src="img/assets/cross.svg" alt="Cross">
+        <h3>Move Sharkie</h3>
+        <div class="key-segment direction-column background-cadetblue shadow-sm mb-4">
+            <img class="arrow-keys mb-1" src="img/5.Botones/Key/arrow keys.png" alt="Arrow Keys">
+            <span class="font-18">alternatively WASD, Shift, Space</span>
+        </div>
+        <h3>Attack</h3>
+        <div class="key-segment background-cadetblue shadow-sm mb-3">
+            <div class="key-wrapper">
+                <div class="key-container mb-1">
+                    <img src="img/5.Botones/Key/key_template.png" alt="Key Template">
+                    <span class="letter font-22">F</span>
+                </div>
+                <span class="font-18">Slap</span>
+            </div>
+
+            <div class="explanation-container">
+                <img src="img/2.Enemy/1.Puffer fish/1.Swim/2.swim1.png" alt="">
+                <span>(Pufferfishes and Endboss)</span>
+            </div>
+        </div>
+
+        <div class="key-segment background-cadetblue shadow-sm mb-3">
+            <div class="key-wrapper">
+                <div class="key-container mb-1">
+                    <img src="img/5.Botones/Key/key_template.png" alt="Key Template">
+                    <span class="letter font-22">G</span>
+                </div>
+                <span class="font-18">Throw Bubble</span>
+            </div>
+
+            <div class="explanation-container">
+                <img class="jellyfish-height" src="img/2.Enemy/2 Jelly fish/Regular damage/Lila 1.png" alt="">
+                <span>(Normal Jellyfishes-only)</span>
+            </div>
+        </div>
+
+        <div class="key-segment background-cadetblue shadow-sm mb-3">
+            <div class="key-wrapper">
+                <div class="key-container mb-1">
+                    <img src="img/5.Botones/Key/key_template.png" alt="Key Template">
+                    <span class="letter font-22">H</span>
+                </div>
+                <span class="font-18">Throw Poison</span>
+            </div>
+            <span class="width-60">(once collected, all enemies except Pufferfish)</span>
+        </div>
+        <span>In need of extra poison? Chests can be looted by paying 6 coins.</span>
+    </div>
+</body>
+
+</html>
